@@ -5,13 +5,57 @@ using namespace std;
 double System_Energy(int *lattice, int N)
 {
    double Energy=0,a,b,c,d;
-   for(int i=1; i<N-1; i++)
+   for(int i=0; i<N; i++)
    {
-      for(int j=1; j<N-1; j++)
+      for(int j=0; j<N; j++)
       {
-
-         Energy=Energy+lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[(i-1)*N+j]+lattice[i*N+j-1];
+         if((i!=0)&&(i!=N-1)&&(j!=0)&&(j!=N-1))
+         {
+            Energy=Energy+lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[(i-1)*N+j]+lattice[i*N+j-1];
+            cout << lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[(i-1)*N+j]+lattice[i*N+j-1] << "\t";
+         }
+         if((i==0)&&(i!=N-1)&&(j!=0)&&(j!=N-1))
+         {
+            Energy=Energy+lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[i*N+j-1];
+            cout << lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[i*N+j-1] << "\t";
+         }
+         if((i!=0)&&(i==N-1)&&(j!=0)&&(j!=N-1))
+         {
+            Energy=Energy+lattice[i*N+j+1]+lattice[(i-1)*N+j]+lattice[i*N+j-1];
+            cout << lattice[i*N+j+1]+lattice[(i-1)*N+j]+lattice[i*N+j-1] << "\t";
+         }
+         if((i!=0)&&(i!=N-1)&&(j==0)&&(j!=N-1))
+         {
+            Energy=Energy+lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[(i-1)*N+j];
+            cout << lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[(i-1)*N+j]<< "\t";
+         }
+         if((i!=0)&&(i!=N-1)&&(j!=0)&&(j==N-1))
+         {
+            Energy=Energy+lattice[(i+1)*N+j]+lattice[(i-1)*N+j]+lattice[i*N+j-1];
+            cout << lattice[(i+1)*N+j]+lattice[(i-1)*N+j]+lattice[i*N+j-1] << "\t";
+         }
+         if((i==0)&&(j==0))
+         {
+            Energy=Energy+lattice[(i+1)*N+j]+lattice[i*N+j+1];
+            cout << lattice[(i+1)*N+j]+lattice[i*N+j+1]<< "\t";
+         }
+         if((i==N-1)&&(j==N-1))
+         {
+            Energy=Energy+lattice[(i-1)*N+j]+lattice[i*N+j-1];
+            cout << lattice[(i-1)*N+j]+lattice[i*N+j-1] << "\t";
+         }
+         if((i==0)&&(j==N-1))
+         {
+            Energy=Energy+lattice[(i+1)*N+j]+lattice[i*N+j-1];
+            cout << lattice[(i+1)*N+j]+lattice[i*N+j-1] << "\t";
+         }
+         if((i==N-1)&&(j==0))
+         {
+            Energy=Energy+lattice[i*N+j+1]+lattice[(i-1)*N+j];
+            cout << lattice[i*N+j+1]+lattice[(i-1)*N+j] << "\t";
+         }
       }
+      cout << "\n";
    }
    return Energy;
 }
