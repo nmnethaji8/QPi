@@ -1,4 +1,6 @@
 #include<iostream>
+#include <thrust/random/linear_congruential_engine.h>
+#include <thrust/random/uniform_int_distribution.h>
 
 using namespace std;
 
@@ -54,7 +56,9 @@ double get_energy(int *lattice, int const N)
 //-----------------------------------------------------------------
 void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N, int const times, double const BJ, double const energy)
 {
-   int spin_arr[N*N];
+   int spin_arr[N*N],x,y,spin_i,spin_f,E_i,E_f;
+   // create a minstd_rand object to act as our source of randomness
+   thrust::minstd_rand rng;
 
    for(int i=0; i<N*N;i++)
    {
@@ -67,6 +71,41 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
       net_energy[i]=0;
    }
 
+   for(int t=0;t<times;t++)
+   {
+      // create a uniform_int_distribution to produce ints from [-7,13]
+      thrust::uniform_int_distribution<int> dist(0,N-1);
+
+      x=dist(rng);
+      y=dist(rng);
+
+      spin_i = spin_arr[x*y]; //initial spin
+      spin_f = spin_i*-1; //proposed spin flip
+
+      //compute change in energy
+      E_i = 0;
+      E_f = 0;
+      if(x>0)
+      {
+         E_i += -spin_i*spin_arr[(x-1)*N+y];
+         E_f += -spin_f*spin_arr[(x-1)*N+y];
+      }
+      if(x<N-1)
+      {
+         E_i += -spin_i*spin_arr[(x+1)*N+y];
+         E_f += -spin_f*spin_arr[(x+1)*N+y];
+      }
+      if(y>0)
+      {
+         E_i += -spin_i*spin_arr[x*N+y-1];
+         E_f += -spin_f*spin_arr[x*N+y-1];
+      }
+      if(y<N-1)
+      {
+         E_i += -spin_i*spin_arr[x*N+y+1];
+         E_f += -spin_f*spin_arr[x*N+y+1];
+      }
+   }
 }
 
 int main()
