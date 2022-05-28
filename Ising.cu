@@ -2,7 +2,7 @@
 
 using namespace std;
 
-double System_Energy(int *lattice, int const N)
+double get_energy(int *lattice, int const N)
 {
    double Energy=0,GlobalEnergy=0;
    for(int i=0; i<N; i++)
@@ -51,6 +51,11 @@ double System_Energy(int *lattice, int const N)
 
    return GlobalEnergy;
 }
+//-----------------------------------------------------------------
+void metropolis(int net_spins, double net_energy, int *pin_arr, int const times, double const BJ, double const energy)
+{
+
+}
 
 int main()
 {
@@ -58,7 +63,11 @@ int main()
    int lattice_p[]={ 1,  1,  1,  1,  1, -1,  1, 1,  1,  1, 1,  1,  1,  1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1};
    int N=5;
 
-   cout << "Energy of System is "<< System_Energy(lattice_p,N) << endl;
+   cout << "Energy of System is "<< get_energy(lattice_p,N) <<"\t" << get_energy(lattice_n,N)<< endl;
+
+   int net_spins=0;
+   double net_energy=0;
+   metropolis(net_spins, net_energy,lattice_n,100, 0.7, get_energy(lattice_n,N));
 
    return 0;
 }
