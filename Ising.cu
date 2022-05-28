@@ -1,4 +1,5 @@
 #include<iostream>
+#include <thrust/reduce.h>
 #include <thrust/random.h>
 #include <thrust/random/linear_congruential_engine.h>
 #include <thrust/random/uniform_int_distribution.h>
@@ -57,13 +58,13 @@ double get_energy(int *lattice, int const N)
    return GlobalEnergy;
 }
 //-----------------------------------------------------------------
-void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N, int const times, double const BJ, double const energy)
+void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N, int const times, double const BJ, double energy)
 {
    int spin_arr[N*N],x,y,spin_i,spin_f,E_i,E_f,dE;
    // create a uniform_int_distribution to produce ints from [-7,13]
    thrust::random::ranlux24_base rng, rng2;
    thrust::uniform_int_distribution<int> dist(0,N-1);
-   thrust::uniform_int_distribution<double> dist2(0,1);
+   thrust::uniform_real_distribution<double> dist2(0,1);
    for(int i=0; i<N*N;i++)
    {
       spin_arr[i]=spin_arr1[i];
@@ -109,18 +110,20 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
       }
 
       // 3 / 4. change state with designated probabilities
-      /*dE = E_f-E_i
-      if((dE>0)&&( dst2(rng2) < exp(-BJ*dE))
+      dE = E_f-E_i;
+      if((dE>0)&&(dist2(rng2) < exp(-BJ*dE)))
       {
-         spin_arr[x*y]=spin_f
-         energy += dE
+         spin_arr[x*N+y]=spin_f;
+         energy += dE;
       }
       else if(dE<=0)
-            spin_arr[x,y]=spin_f
-            energy += dE
-            
-        net_spins[t] = spin_arr.sum()
-        net_energy[t] = energy*/
+      {
+         spin_arr[x*N+y]=spin_f;
+         energy += dE;
+      }
+
+      net_spins[t] = thrust::reduce(thrust::host, spin_arr, spin_arr + N*N, spin_arr[0]);
+      net_energy[t]= energy;
    }
 }
 
