@@ -1,6 +1,9 @@
 #include<iostream>
+#include <thrust/random.h>
 #include <thrust/random/linear_congruential_engine.h>
 #include <thrust/random/uniform_int_distribution.h>
+#include <cuda.h>
+#include <curand.h>
 
 using namespace std;
 
@@ -11,7 +14,7 @@ double get_energy(int *lattice, int const N)
    {
       for(int j=0; j<N; j++)
       {
-         if((i!=0)&&(i!=N-1)&&(j!=0)&&(j!=N-1))
+         if((i!=0)&&(i!=(N-1))&&(j!=0)&&(j!=(N-1)))
          {
             Energy=lattice[(i+1)*N+j]+lattice[i*N+j+1]+lattice[(i-1)*N+j]+lattice[i*N+j-1];
          }
@@ -56,10 +59,11 @@ double get_energy(int *lattice, int const N)
 //-----------------------------------------------------------------
 void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N, int const times, double const BJ, double const energy)
 {
-   int spin_arr[N*N],x,y,spin_i,spin_f,E_i,E_f;
-   // create a minstd_rand object to act as our source of randomness
-   thrust::minstd_rand rng;
-
+   int spin_arr[N*N],x,y,spin_i,spin_f,E_i,E_f,dE;
+   // create a uniform_int_distribution to produce ints from [-7,13]
+   thrust::random::ranlux24_base rng, rng2;
+   thrust::uniform_int_distribution<int> dist(0,N-1);
+   thrust::uniform_int_distribution<double> dist2(0,1);
    for(int i=0; i<N*N;i++)
    {
       spin_arr[i]=spin_arr1[i];
@@ -72,14 +76,12 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
    }
 
    for(int t=0;t<times;t++)
-   {
-      // create a uniform_int_distribution to produce ints from [-7,13]
-      thrust::uniform_int_distribution<int> dist(0,N-1);
-
+   {  
       x=dist(rng);
       y=dist(rng);
+      //cout << "(" << x << "," << y << ")\t";
 
-      spin_i = spin_arr[x*y]; //initial spin
+      spin_i = spin_arr[x*N+y]; //initial spin
       spin_f = spin_i*-1; //proposed spin flip
 
       //compute change in energy
@@ -105,6 +107,20 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
          E_i += -spin_i*spin_arr[x*N+y+1];
          E_f += -spin_f*spin_arr[x*N+y+1];
       }
+
+      // 3 / 4. change state with designated probabilities
+      /*dE = E_f-E_i
+      if((dE>0)&&( dst2(rng2) < exp(-BJ*dE))
+      {
+         spin_arr[x*y]=spin_f
+         energy += dE
+      }
+      else if(dE<=0)
+            spin_arr[x,y]=spin_f
+            energy += dE
+            
+        net_spins[t] = spin_arr.sum()
+        net_energy[t] = energy*/
    }
 }
 
