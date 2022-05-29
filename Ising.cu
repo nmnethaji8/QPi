@@ -164,10 +164,10 @@ int main()
    cout << "Energy of System is "<< get_energy(lattice_p,N) <<"\t" << get_energy(lattice_n,N)<< endl;
 
    int *net_spins, times=1000;
-   double *net_energy;
+   double *net_energy,tb=0.7;
    net_spins = new int[times];
    net_energy = new double[times];
-   metropolis(net_spins, net_energy,lattice_n, N ,times, 0.7, get_energy(lattice_n,N));
+   metropolis(net_spins, net_energy,lattice_n, N ,times, tb, get_energy(lattice_n,N));
 
    return 0;
 }
