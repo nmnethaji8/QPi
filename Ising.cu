@@ -7,7 +7,14 @@
 #include <curand.h>
 
 using namespace std;
-
+template<class T> void print1D( T *array,int const N )
+{
+   for(int i=0;i<N;i++)
+   {
+      cout << array[i] << "\t"; 
+   }
+   cout << "\n";
+}
 double get_energy(int *lattice, int const N)
 {
    double Energy=0,GlobalEnergy=0;
@@ -124,7 +131,6 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
 
       net_spins[t] = thrust::reduce(thrust::host, spin_arr, spin_arr + N*N, spin_arr[0]);
       net_energy[t]= energy;
-            cout << energy << "\n";
    }
 }
 
@@ -132,7 +138,7 @@ int main()
 {
    thrust::random::ranlux24_base rng;
    thrust::uniform_real_distribution<double> dist(0,1);
-   int const N=5;
+   int const N=50;
    int lattice_n[N*N],lattice_p[N*N];
    double k;
    for(int i=0;i<N*N;i++)
@@ -161,13 +167,15 @@ int main()
    //int lattice_n[]={ 1, -1, -1, -1, -1,  1,  1, 1, -1, -1, 1, -1, -1, -1, -1,  1,  1, -1, -1, -1, -1, -1, -1,  1, -1};
    //int lattice_p[]={ 1,  1,  1,  1,  1, -1,  1, 1,  1,  1, 1,  1,  1,  1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1};
 
-   cout << "Energy of System is "<< get_energy(lattice_p,N) <<"\t" << get_energy(lattice_n,N)<< endl;
+   //cout << "Energy of System is "<< get_energy(lattice_p,N) <<"\t" << get_energy(lattice_n,N)<< endl;
 
-   int *net_spins, times=1000;
+   int *net_spins, times=1000000;
    double *net_energy,tb=0.7;
    net_spins = new int[times];
    net_energy = new double[times];
    metropolis(net_spins, net_energy,lattice_n, N ,times, tb, get_energy(lattice_n,N));
 
+   //print1D(net_spins,times);
+   //print1D(net_energy,times);
    return 0;
 }
