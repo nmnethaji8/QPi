@@ -5,7 +5,7 @@ flags=-Mcuda -acc
 #$(FC) $(flags) -c++libs -o IsingFort.o
 
 IsingFort:IsingFort.f95 
-	$(FC) $(flags) IsingFort.f95
+	$(FC) $(flags) IsingFort.f95 -o IsingFort
 
 cleanAll:
 	rm -rf IsingFort *.o *.mod
