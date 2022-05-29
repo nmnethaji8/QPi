@@ -29,9 +29,10 @@ MODULE FUNC
    SUBROUTINE metropolis(net_spins, net_energy, spin_arr,  N, times, BJ, energy)
       IMPLICIT NONE
       INTEGER(KIND=4),INTENT(IN)::N,times
-      INTEGER(KIND=4),DIMENSION(times)::net_spins, net_energy
+      INTEGER(KIND=4),DIMENSION(times)::net_spins
+      REAL(KIND=8),DIMENSION(times)::net_energy
       INTEGER(KIND=4),DIMENSION(N,N)::spin_arr
-      REAL(KIND=8), INTENT(IN)::BJ, energy
+      REAL(KIND=8), INTENT(INOUT)::BJ, energy
 
       INTEGER(KIND=4)::I,T,x,y, spin_i, spin_f
       REAL(KIND=8)::u,E_i,E_f,dE
@@ -66,6 +67,17 @@ MODULE FUNC
          ENDIF
 
          dE = E_f-E_i
+         call random_number(u)
+         IF((dE.GT.0).AND.(u.LT.exp(-BJ*dE))) THEN
+            spin_arr(y,x)=spin_f
+            energy = energy+ dE
+         ELSE IF( dE.LE.0 ) THEN
+            spin_arr(y,x)=spin_f
+            energy = energy+ dE
+         ENDIF
+
+         net_spins(T)=SUM(SUM(spin_arr,1),1)
+         net_energy(T)= energy
       ENDDO
    END SUBROUTINE metropolis
 END MODULE FUNC
@@ -77,8 +89,9 @@ PROGRAM MAIN
    INTEGER(KIND=4), PARAMETER::N=5,times=100
    INTEGER(KIND=4),DIMENSION(N, N),MANAGED::lattice_n,lattice_p
    REAL(KIND=8)::Energy,BJ=0.7
-   INTEGER(KIND=4),MANAGED,DIMENSION(times)::net_spins, net_energy
-
+   INTEGER(KIND=4),MANAGED,DIMENSION(times)::net_spins
+   REAL(KIND=8),MANAGED,DIMENSION(times)::net_energy
+   
    lattice_n=reshape((/1, -1, -1, -1, -1,  1,  1, 1, -1, -1, 1, -1, -1, -1, -1,  1,  1, -1, -1, -1, -1, -1, -1,  1, -1/),shape(lattice_n))
    lattice_p=reshape((/1,  1,  1,  1,  1, -1,  1, 1,  1,  1, 1,  1,  1,  1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1/),shape(lattice_p))
 

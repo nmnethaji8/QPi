@@ -111,7 +111,6 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
 
       // 3 / 4. change state with designated probabilities
       dE = E_f-E_i;
-      cout << dE << "\n";
       if((dE>0)&&(dist2(rng2) < exp(-BJ*dE)))
       {
          spin_arr[x*N+y]=spin_f;
@@ -125,6 +124,7 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
 
       net_spins[t] = thrust::reduce(thrust::host, spin_arr, spin_arr + N*N, spin_arr[0]);
       net_energy[t]= energy;
+            cout << energy << "\n";
    }
 }
 
