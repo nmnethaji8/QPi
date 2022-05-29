@@ -130,13 +130,40 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
 
 int main()
 {
-   int lattice_n[]={ 1, -1, -1, -1, -1,  1,  1, 1, -1, -1, 1, -1, -1, -1, -1,  1,  1, -1, -1, -1, -1, -1, -1,  1, -1};
-   int lattice_p[]={ 1,  1,  1,  1,  1, -1,  1, 1,  1,  1, 1,  1,  1,  1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1};
-   int N=5;
+   thrust::random::ranlux24_base rng;
+   thrust::uniform_real_distribution<double> dist(0,1);
+   int const N=5;
+   int lattice_n[N*N],lattice_p[N*N];
+   double k;
+   for(int i=0;i<N*N;i++)
+   {
+      k=dist(rng);
+      if(k<0.75)
+      {
+         lattice_n[i]=-1;
+      }
+      else
+      {
+         lattice_n[i]=1;
+      }
+
+      k=dist(rng);
+      if(k<0.75)
+      {
+         lattice_p[i]=1;
+      }
+      else
+      {
+         lattice_p[i]=-1;
+      }
+   }
+
+   //int lattice_n[]={ 1, -1, -1, -1, -1,  1,  1, 1, -1, -1, 1, -1, -1, -1, -1,  1,  1, -1, -1, -1, -1, -1, -1,  1, -1};
+   //int lattice_p[]={ 1,  1,  1,  1,  1, -1,  1, 1,  1,  1, 1,  1,  1,  1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1};
 
    cout << "Energy of System is "<< get_energy(lattice_p,N) <<"\t" << get_energy(lattice_n,N)<< endl;
 
-   int *net_spins, times=100;
+   int *net_spins, times=1000;
    double *net_energy;
    net_spins = new int[times];
    net_energy = new double[times];
