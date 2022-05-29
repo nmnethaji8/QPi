@@ -30,11 +30,11 @@ MODULE FUNC
       IMPLICIT NONE
       INTEGER(KIND=4),INTENT(IN)::N,times
       INTEGER(KIND=4),DIMENSION(times)::net_spins, net_energy
-      INTEGER(KIND=4),DIMENSION(N)::spin_arr
+      INTEGER(KIND=4),DIMENSION(N,N)::spin_arr
       REAL(KIND=8), INTENT(IN)::BJ, energy
 
-      INTEGER(KIND=4)::I,T,x,y
-      REAL(KIND=8)::u
+      INTEGER(KIND=4)::I,T,x,y, spin_i, spin_f
+      REAL(KIND=8)::u,E_i,E_f,dE
 
       DO T=1,times
          call random_number(u)
@@ -42,7 +42,30 @@ MODULE FUNC
          call random_number(u)
          y=1+FLOOR((N)*u)
 
-         
+         spin_i = spin_arr(y,x); !initial spin
+         spin_f = -spin_i; !proposed spin flip
+
+         E_i = 0
+         E_f = 0
+
+         IF(x.GT.1)THEN
+            E_i =E_i-spin_i*spin_arr(y,x-1)
+            E_f =E_i-spin_f*spin_arr(y,x-1)
+         ENDIF
+         IF(x.LT.N)THEN
+            E_i =E_i-spin_i*spin_arr(y,x+1)
+            E_f =E_f-spin_f*spin_arr(y,x+1)
+         ENDIF
+         IF(y.GT.1)THEN
+            E_i =E_i-spin_i*spin_arr(y-1,x)
+            E_f =E_f-spin_f*spin_arr(y-1,x)
+         ENDIF
+         IF(y.LT.N)THEN
+            E_i =E_i-spin_i*spin_arr(y+1,x)
+            E_f =E_f-spin_f*spin_arr(y+1,x)
+         ENDIF
+
+         dE = E_f-E_i
       ENDDO
    END SUBROUTINE metropolis
 END MODULE FUNC

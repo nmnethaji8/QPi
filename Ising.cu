@@ -52,9 +52,7 @@ double get_energy(int *lattice, int const N)
             Energy=lattice[i*N+j+1]+lattice[(i-1)*N+j];
          }
          GlobalEnergy=GlobalEnergy+(-lattice[i*N+j]*Energy);
-         cout << lattice[i*N+j] << "," << Energy << "\t";
       }
-      cout << "\n";
    }
 
    return GlobalEnergy;
@@ -113,6 +111,7 @@ void metropolis(int *net_spins, double *net_energy, int *spin_arr1, int const N,
 
       // 3 / 4. change state with designated probabilities
       dE = E_f-E_i;
+      cout << dE << "\n";
       if((dE>0)&&(dist2(rng2) < exp(-BJ*dE)))
       {
          spin_arr[x*N+y]=spin_f;
