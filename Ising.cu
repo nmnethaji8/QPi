@@ -52,7 +52,9 @@ double get_energy(int *lattice, int const N)
             Energy=lattice[i*N+j+1]+lattice[(i-1)*N+j];
          }
          GlobalEnergy=GlobalEnergy+(-lattice[i*N+j]*Energy);
+         cout << lattice[i*N+j] << "," << Energy << "\t";
       }
+      cout << "\n";
    }
 
    return GlobalEnergy;
