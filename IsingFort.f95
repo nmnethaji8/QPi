@@ -33,6 +33,17 @@ MODULE FUNC
       INTEGER(KIND=4),DIMENSION(N)::spin_arr
       REAL(KIND=8), INTENT(IN)::BJ, energy
 
+      INTEGER(KIND=4)::I,T,x,y
+      REAL(KIND=8)::u
+
+      DO T=1,times
+         call random_number(u)
+         x=1+FLOOR((N)*u)
+         call random_number(u)
+         y=1+FLOOR((N)*u)
+
+         
+      ENDDO
    END SUBROUTINE metropolis
 END MODULE FUNC
 
