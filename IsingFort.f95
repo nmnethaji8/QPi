@@ -25,19 +25,30 @@ MODULE FUNC
          ENDDO 
       ENDDO
    END SUBROUTINE get_energy
+
+   SUBROUTINE metropolis(net_spins, net_energy, spin_arr,  N, times, BJ, energy)
+      IMPLICIT NONE
+      INTEGER(KIND=4),INTENT(IN)::N,times
+      INTEGER(KIND=4),DIMENSION(times)::net_spins, net_energy
+      INTEGER(KIND=4),DIMENSION(N)::spin_arr
+      REAL(KIND=8), INTENT(IN)::BJ, energy
+
+   END SUBROUTINE metropolis
 END MODULE FUNC
 
 PROGRAM MAIN
    USE CUDAFOR
    USE FUNC
    IMPLICIT NONE
-   INTEGER(KIND=4), PARAMETER::N=5
+   INTEGER(KIND=4), PARAMETER::N=5,times=100
    INTEGER(KIND=4),DIMENSION(N, N),MANAGED::lattice_n,lattice_p
-   REAL(KIND=8)::Energy
+   REAL(KIND=8)::Energy,BJ=0.7
+   INTEGER(KIND=4),MANAGED,DIMENSION(times)::net_spins, net_energy
 
    lattice_n=reshape((/1, -1, -1, -1, -1,  1,  1, 1, -1, -1, 1, -1, -1, -1, -1,  1,  1, -1, -1, -1, -1, -1, -1,  1, -1/),shape(lattice_n))
    lattice_p=reshape((/1,  1,  1,  1,  1, -1,  1, 1,  1,  1, 1,  1,  1,  1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1/),shape(lattice_p))
 
    CALL get_energy(lattice_p,N,Energy)
    PRINT*,Energy
+   CALL metropolis(net_spins, net_energy,lattice_n, N ,times, BJ, Energy)
 END PROGRAM MAIN
