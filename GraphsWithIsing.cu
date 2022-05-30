@@ -31,6 +31,11 @@ class Vertix
    }
 };
 
+int get_energy(int *lattice, Vertix *vertices, int const N)
+{
+   return 0;
+}
+
 int main()
 {
    int V,E;
@@ -107,5 +112,8 @@ int main()
          lattice[i]=1;
       }
    }
+
+//Calculating Energy
+   cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
    return 0;
 }
