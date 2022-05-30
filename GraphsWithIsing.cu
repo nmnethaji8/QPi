@@ -10,6 +10,14 @@ using namespace std;
 
 #define cMM cudaMallocManaged
 
+template<class T> void print1D( T *array,int const N )
+{
+   for(int i=0;i<N;i++)
+   {
+      cout << array[i] << "\n"; 
+   }
+}
+
 class Edge
 {
    public:
@@ -168,10 +176,11 @@ int main()
    //cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
 
 //Calling Metropolis Algorithm
-   int *net_spins,*net_energy,times=10;
+   int *net_spins,*net_energy,times=10000;
    i=cMM(&net_spins,times*sizeof(int));
    i=cMM(&net_energy,times*sizeof(int));
    metropolis(net_spins, net_energy,lattice,vertices, V ,times, get_energy(lattice,vertices,V));
 
+   print1D<int>(net_energy,times);
    return 0;
 }
