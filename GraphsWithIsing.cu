@@ -37,13 +37,14 @@ int main()
 
    Edge *edges;
 
-   int i= cMM(&edges, E*sizeof(Edge));
+   int i= cMM(&edges, E*sizeof(Edge)),j,k;
    for(i=0;i<E;i++)
    {
       Graph >> edges[i].v0 >> edges[i].v1 >> edges[i].wt;
       //cout << edges[i].v0 << " " << edges[i].v1 << " " << edges[i].wt<< "\n" ;
    }
 
+//Calculating Number of neighbours for each vertix
    Vertix *vertices;
    i= cMM(&vertices, V*sizeof(Vertix));
    for(i=0;i<E;i++)
@@ -51,10 +52,32 @@ int main()
       vertices[edges[i].v0-1].n++;
       vertices[edges[i].v1-1].n++;
    }
-   for(int j=0;j<V;j++)
+   for(j=0;j<V;j++)
    {
       //cout << vertices[j].n << "\n";
       i=cMM(&vertices[j].Neigh, (vertices[j].n)*sizeof(Vertix));
+      vertices[j].n=0;
+   }
+
+//Storing Neughbours for each vertix
+   for(i=0;i<E;i++)
+   {
+      vertices[edges[i].v0-1].Neigh[(vertices[edges[i].v0-1].n)]=edges[i].v1;
+      vertices[edges[i].v1-1].Neigh[(vertices[edges[i].v1-1].n)]=edges[i].v0;
+
+      vertices[edges[i].v0-1].n+=1;
+      vertices[edges[i].v1-1].n+=1;
+   }
+
+//Printing Neighbours for each Vertix
+   for(i=0;i<V;i++)
+   {
+      cout << i+1 << "\t";
+      for(j=0;j<vertices[i].n;j++)
+      {
+         cout << vertices[i].Neigh[j] << "\t";
+      }
+      cout << "\n";
    }
    return 0;
 }
