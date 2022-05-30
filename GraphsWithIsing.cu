@@ -16,13 +16,14 @@ class Edge
    }
 };
 
-class Vertices
+class Vertix
 {
    public:
-   int *Neigh;
-   Vertices()
+   int *Neigh,n;
+   Vertix()
    {
       Neigh=nullptr;
+      n=0;
    }
 };
 
@@ -40,7 +41,20 @@ int main()
    for(i=0;i<E;i++)
    {
       Graph >> edges[i].v0 >> edges[i].v1 >> edges[i].wt;
-      cout << edges[i].v0 << " " << edges[i].v1 << " " << edges[i].wt<< "\n" ;
+      //cout << edges[i].v0 << " " << edges[i].v1 << " " << edges[i].wt<< "\n" ;
+   }
+
+   Vertix *vertices;
+   i= cMM(&vertices, V*sizeof(Vertix));
+   for(i=0;i<E;i++)
+   {
+      vertices[edges[i].v0-1].n++;
+      vertices[edges[i].v1-1].n++;
+   }
+   for(int j=0;j<V;j++)
+   {
+      //cout << vertices[j].n << "\n";
+      i=cMM(&vertices[j].Neigh, (vertices[j].n)*sizeof(Vertix));
    }
    return 0;
 }
