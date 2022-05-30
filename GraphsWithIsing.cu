@@ -1,6 +1,7 @@
 #include<iostream>
 #include<fstream>
 #include<cuda.h>
+#include <thrust/reduce.h>
 #include <thrust/random.h>
 #include <thrust/random/linear_congruential_engine.h>
 #include <thrust/random/uniform_int_distribution.h>
@@ -48,10 +49,40 @@ int get_energy(int *lattice, Vertix *vertices, int const V)
    return GlobalEnergy;
 }
 
-void metropolis(int *net_spins,int *net_energy,int *lattice,int V ,int times, int InEnergy)
+void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, int V ,int times, int InEnergy)
 {
-   thrust::random::ranlux24_base rand;
+   int t,x,spin_i,spin_f,E_i,E_f,j,dE, energy=0;
+
+   thrust::random::ranlux24_base rnd;
    thrust::uniform_int_distribution<int> dist(0,V-1);
+
+   for(t=0;t<times;t++)
+   {
+      x=dist(rnd);
+
+      spin_i =  lattice[x];   //initial spin
+      spin_f = -spin_i;       //proposed spin flip
+
+      //compute change in energy
+      E_i = 0;
+      E_f = 0;
+
+      for(j=0;j<vertices[x].n;j++)
+      {
+         E_i+=vertices[x].wt[j]*spin_i;
+         E_f+=vertices[x].wt[j]*spin_f;
+      }
+
+      dE = E_f-E_i;
+      if(dE<0)
+      {
+         lattice[x]=spin_f;
+         energy+=dE;
+      }
+
+      net_spins[t] = thrust::reduce(thrust::host, lattice, lattice+V, lattice[0]);
+      net_energy[t]= energy;
+   }
 
 }
 
@@ -140,7 +171,7 @@ int main()
    int *net_spins,*net_energy,times=10;
    i=cMM(&net_spins,times*sizeof(int));
    i=cMM(&net_energy,times*sizeof(int));
-   metropolis(net_spins, net_energy,lattice, V ,times, get_energy(lattice,vertices,V));
+   metropolis(net_spins, net_energy,lattice,vertices, V ,times, get_energy(lattice,vertices,V));
 
    return 0;
 }
