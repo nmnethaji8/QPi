@@ -48,6 +48,13 @@ int get_energy(int *lattice, Vertix *vertices, int const V)
    return GlobalEnergy;
 }
 
+void metropolis(int *net_spins,int *net_energy,int *lattice,int V ,int times, int InEnergy)
+{
+   thrust::random::ranlux24_base rand;
+   thrust::uniform_int_distribution<int> dist(0,V-1);
+
+}
+
 int main()
 {
    int V,E;
@@ -108,7 +115,8 @@ int main()
 //Creating lattice
    thrust::random::ranlux24_base rng;
    thrust::uniform_real_distribution<double> dist(0,1);
-   int lattice[V];
+   int *lattice;
+   i=cMM(&lattice,V*sizeof(int));
    double k;
 
 //Making 50% of the vertices positive
@@ -126,6 +134,13 @@ int main()
    }
 
 //Calculating Energy
-   cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
+   //cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
+
+//Calling Metropolis Algorithm
+   int *net_spins,*net_energy,times=10;
+   i=cMM(&net_spins,times*sizeof(int));
+   i=cMM(&net_energy,times*sizeof(int));
+   metropolis(net_spins, net_energy,lattice, V ,times, get_energy(lattice,vertices,V));
+
    return 0;
 }
