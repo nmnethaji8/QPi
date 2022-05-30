@@ -31,9 +31,21 @@ class Vertix
    }
 };
 
-int get_energy(int *lattice, Vertix *vertices, int const N)
+int get_energy(int *lattice, Vertix *vertices, int const V)
 {
-   return 0;
+   int LocalEnergy=0,GlobalEnergy=0,i,j;
+   for(i=0; i<V; i++)
+   {
+      for(j=0;j<vertices[i].n;j++)
+      {
+         //cout << vertices[i].wt[j] << "\t";
+         LocalEnergy+=vertices[i].wt[j]*lattice[vertices[i].Neigh[j]-1];
+         //cout << vertices[i].wt[j] << " " << lattice[vertices[i].Neigh[j]-1] <<"\t";
+      }
+      //cout << "\n";
+      GlobalEnergy+=LocalEnergy*lattice[i];
+   }
+   return GlobalEnergy;
 }
 
 int main()
@@ -99,11 +111,11 @@ int main()
    int lattice[V];
    double k;
 
-//Making 75% of the vertices negative
+//Making 50% of the vertices positive
    for(i=0;i<V;i++)
    {
       k=dist(rng);
-      if(k<0.75)
+      if(k<0.50)
       {
          lattice[i]=-1;
       }
