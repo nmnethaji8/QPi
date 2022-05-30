@@ -19,10 +19,11 @@ class Edge
 class Vertix
 {
    public:
-   int *Neigh,n;
-   Vertix()
+   int *Neigh,n,*wt;
+   __device__ __host__ Vertix()
    {
       Neigh=nullptr;
+      wt=nullptr;
       n=0;
    }
 };
@@ -55,15 +56,19 @@ int main()
    for(j=0;j<V;j++)
    {
       //cout << vertices[j].n << "\n";
-      i=cMM(&vertices[j].Neigh, (vertices[j].n)*sizeof(Vertix));
+      i=cMM(&vertices[j].Neigh, (vertices[j].n)*sizeof(int));
+      i=cMM(&vertices[j].wt, (vertices[j].n)*sizeof(int));
       vertices[j].n=0;
    }
 
 //Storing Neughbours for each vertix
    for(i=0;i<E;i++)
    {
-      vertices[edges[i].v0-1].Neigh[(vertices[edges[i].v0-1].n)]=edges[i].v1;
-      vertices[edges[i].v1-1].Neigh[(vertices[edges[i].v1-1].n)]=edges[i].v0;
+      vertices[edges[i].v0-1].Neigh[vertices[edges[i].v0-1].n]=edges[i].v1;
+      vertices[edges[i].v1-1].Neigh[vertices[edges[i].v1-1].n]=edges[i].v0;
+
+      vertices[edges[i].v0-1].wt[vertices[edges[i].v0-1].n]=edges[i].wt;
+      vertices[edges[i].v1-1].wt[vertices[edges[i].v1-1].n]=edges[i].wt;
 
       vertices[edges[i].v0-1].n+=1;
       vertices[edges[i].v1-1].n+=1;
@@ -75,7 +80,7 @@ int main()
       cout << i+1 << "\t";
       for(j=0;j<vertices[i].n;j++)
       {
-         cout << vertices[i].Neigh[j] << "\t";
+         cout << vertices[i].wt[j] << "\t";
       }
       cout << "\n";
    }
