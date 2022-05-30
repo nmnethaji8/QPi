@@ -1,6 +1,9 @@
 #include<iostream>
 #include<fstream>
 #include<cuda.h>
+#include <thrust/random.h>
+#include <thrust/random/linear_congruential_engine.h>
+#include <thrust/random/uniform_int_distribution.h>
 
 using namespace std;
 
@@ -38,7 +41,7 @@ int main()
 
    Edge *edges;
 
-   int i= cMM(&edges, E*sizeof(Edge)),j,k;
+   int i= cMM(&edges, E*sizeof(Edge)),j;
    for(i=0;i<E;i++)
    {
       Graph >> edges[i].v0 >> edges[i].v1 >> edges[i].wt;
@@ -75,7 +78,7 @@ int main()
    }
 
 //Printing Neighbours for each Vertix
-   for(i=0;i<V;i++)
+   /*for(i=0;i<V;i++)
    {
       cout << i+1 << "\t";
       for(j=0;j<vertices[i].n;j++)
@@ -83,6 +86,26 @@ int main()
          cout << vertices[i].wt[j] << "\t";
       }
       cout << "\n";
+   }*/
+
+//Creating lattice
+   thrust::random::ranlux24_base rng;
+   thrust::uniform_real_distribution<double> dist(0,1);
+   int lattice[V];
+   double k;
+
+//Making 75% of the vertices negative
+   for(i=0;i<V;i++)
+   {
+      k=dist(rng);
+      if(k<0.75)
+      {
+         lattice[i]=-1;
+      }
+      else
+      {
+         lattice[i]=1;
+      }
    }
    return 0;
 }
