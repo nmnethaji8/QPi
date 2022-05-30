@@ -10,7 +10,7 @@ class Edge
 {
    public:
    int v0,v1,wt;
-   Edge()
+   __device__ __host__ Edge()
    {
       v0=0,v1=0,wt=0;
    }
@@ -34,10 +34,10 @@ int main()
 
    Graph >> V >> E;
 
-   Edge edges[E];
+   Edge *edges;
 
-   //int i= cMM(&edges, E*sizeof(Edge));
-   for(int i=0;i<E;i++)
+   int i= cMM(&edges, E*sizeof(Edge));
+   for(i=0;i<E;i++)
    {
       Graph >> edges[i].v0 >> edges[i].v1 >> edges[i].wt;
       cout << edges[i].v0 << " " << edges[i].v1 << " " << edges[i].wt<< "\n" ;
