@@ -9,8 +9,8 @@
 
 #cleanAll:
 #	rm -rf IsingFort *.o *.mod
-nv=/opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin/nvcc
-flags=
+nv=/opt/nvidia/hpc_sdk/Linux_x86_64/22.2/compilers/bin/nvc++
+flags=-acc
 #Ising:Ising.cu
 #	$(nv) $(flags) Ising.cu -o Ising
 
