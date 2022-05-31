@@ -57,15 +57,15 @@ int get_energy(int *lattice, Vertix *vertices, int const V)
    return GlobalEnergy;
 }
 
-void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, int V ,int times, int InEnergy)
+void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, int V ,int times, int energy)
 {
-   int t,x,spin_i,spin_f,E_i,E_f,j,dE, energy=0;
+   int t,x,spin_i,spin_f,E_i,E_f,j,dE;
 
    thrust::random::ranlux24_base rnd;
    thrust::uniform_int_distribution<int> dist(0,V-1);
    thrust::uniform_int_distribution<double> dist2(0,1);
 
-   double beta=0.1;
+   double beta=0.7;
 
    for(t=0;t<times;t++)
    {
@@ -192,7 +192,7 @@ int main()
 //print1D<int>(net_energy,times);
 
 //Calculating the Best Cut
-   int BestCut=0;
+/*   int BestCut=0;
    for(i=0;i<E;i++)
    {
       if(lattice[edges[i].v0-1]!=lattice[edges[i].v1-1])
@@ -200,6 +200,6 @@ int main()
          BestCut++;
       }
    }
-   cout <<"The best cut is\t" << BestCut << "\n";
+   cout <<"The best cut is\t" << BestCut << "\n";*/
    return 0;
 }
