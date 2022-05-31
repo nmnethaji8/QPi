@@ -77,8 +77,8 @@ void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, in
 
       for(j=0;j<vertices[x].n;j++)
       {
-         E_i+=vertices[x].wt[j]*spin_i;
-         E_f+=vertices[x].wt[j]*spin_f;
+         E_i+=vertices[x].wt[j]*lattice[vertices[x].Neigh[j]-1]*spin_i;
+         E_f+=vertices[x].wt[j]*lattice[vertices[x].Neigh[j]-1]*spin_f;
       }
 
       dE = E_f-E_i;
@@ -181,6 +181,17 @@ int main()
    i=cMM(&net_energy,times*sizeof(int));
    metropolis(net_spins, net_energy,lattice,vertices, V ,times, get_energy(lattice,vertices,V));
 
-   print1D<int>(net_energy,times);
+//print1D<int>(net_energy,times);
+
+//Calculating the Best Cut
+   int BestCut=0;
+   for(i=0;i<E;i++)
+   {
+      if(lattice[edges[i].v0-1]!=lattice[edges[i].v1-1])
+      {
+         BestCut++;
+      }
+   }
+   cout <<"The best cut is\t" << BestCut << "\n";
    return 0;
 }
