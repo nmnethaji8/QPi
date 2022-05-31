@@ -60,13 +60,14 @@ int get_energy(int *lattice, Vertix *vertices, int const V)
 
 void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices, int V, int times, int energy)
 {
-   int t, x, spin_i, spin_f, E_i, E_f, j, dE;
+   int t, x, spin_i, spin_f, E_i, E_f, j, dE, Fp = 200; // number of flips
 
    thrust::random::ranlux24_base rnd;
    thrust::uniform_int_distribution<int> dist(0, V - 1);
    thrust::uniform_int_distribution<double> dist2(0, 1);
+   thrust::uniform_int_distribution<int> dist3(0, Fp);
 
-   double beta = 0.7;
+   double beta = 0.7, p = Fp, decay = 0.01;
    int *lattice, i, s = 0;
    i = cMM(&lattice, V * sizeof(int));
 
@@ -102,12 +103,12 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
                }
 
                dE = E_f - E_i;
-               if ((dE > 0) && (dist2(rnd) < exp(-beta * dE)))
+               if ((dE > 0) && (dist2(rnd) < exp(-beta * dE)) && (dist3(rnd) < p))
                {
                   lattice[x] = spin_f;
                   // energy += dE;
                }
-               else if (dE < 0)
+               else if ((dE < 0) && (dist3(rnd) < p))
                {
                   lattice[x] = spin_f;
                   // energy += dE;
@@ -124,6 +125,7 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
             }
          }
          s++;
+         p = p * decay;
       }
    }
 }
@@ -210,7 +212,7 @@ int main()
    cout << "Energy of System is " << get_energy(lattice, vertices, V) << "\n";
 
    // Calling Metropolis Algorithm
-   int *net_spins, *net_energy, times = 1000;   // Sweeps or times
+   int *net_spins, *net_energy, times = 1000; // Sweeps or times
    i = cMM(&net_spins, times * sizeof(int));
    i = cMM(&net_energy, times * sizeof(int));
    metropolis(net_spins, net_energy, lattice, vertices, V, times, get_energy(lattice, vertices, V));
@@ -219,14 +221,14 @@ int main()
    cout << "Energy of System is " << get_energy(lattice, vertices, V) << "\n";
 
    // Calculating the Best Cut
-   /*   int BestCut=0;
-      for(i=0;i<E;i++)
+   int BestCut = 0;
+   for (i = 0; i < E; i++)
+   {
+      if (lattice[edges[i].v0 - 1] != lattice[edges[i].v1 - 1])
       {
-         if(lattice[edges[i].v0-1]!=lattice[edges[i].v1-1])
-         {
-            BestCut++;
-         }
+         BestCut++;
       }
-      cout <<"The best cut is\t" << BestCut << "\n";*/
+   }
+   cout << "The best cut is\t" << BestCut << "\n";
    return 0;
 }
