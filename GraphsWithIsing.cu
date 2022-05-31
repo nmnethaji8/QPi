@@ -67,59 +67,63 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
    thrust::uniform_int_distribution<double> dist2(0, 1);
 
    double beta = 0.7;
-   int *lattice, i;
+   int *lattice, i, s = 0;
    i = cMM(&lattice, V * sizeof(int));
 
 #pragma acc data copy(lattice [0:V - 1], latticeO [0:V - 1], vertices [0:V - 1])
    {
-#pragma acc kernels
+      while (s < times)
       {
-         #pragma acc loop
-         for (i = 0; i < V; i++)
+#pragma acc kernels
          {
-            lattice[i] = latticeO[i];
-         }
-
-         #pragma acc loop
-         for (t = 0; t < times; t++)
-         {
-            x = dist(rnd);
-
-            spin_i = lattice[x]; // initial spin
-            spin_f = -spin_i;    // proposed spin flip
-
-            // compute change in energy
-            E_i = 0;
-            E_f = 0;
-
-            #pragma acc loop
-            for (j = 0; j < vertices[x].n; j++)
+#pragma acc loop
+            for (i = 0; i < V; i++)
             {
-               E_i += vertices[x].wt[j] * latticeO[vertices[x].Neigh[j] - 1] * spin_i;
-               E_f += vertices[x].wt[j] * latticeO[vertices[x].Neigh[j] - 1] * spin_f;
+               lattice[i] = latticeO[i];
             }
 
-            dE = E_f - E_i;
-            if ((dE > 0) && (dist2(rnd) < exp(-beta * dE)))
+#pragma acc loop
+            for (t = 0; t < V; t++)
             {
-               lattice[x] = spin_f;
-               //energy += dE;
-            }
-            else if (dE < 0)
-            {
-               lattice[x] = spin_f;
-               //energy += dE;
+               x = dist(rnd);
+
+               spin_i = lattice[x]; // initial spin
+               spin_f = -spin_i;    // proposed spin flip
+
+               // compute change in energy
+               E_i = 0;
+               E_f = 0;
+
+#pragma acc loop
+               for (j = 0; j < vertices[x].n; j++)
+               {
+                  E_i += vertices[x].wt[j] * latticeO[vertices[x].Neigh[j] - 1] * spin_i;
+                  E_f += vertices[x].wt[j] * latticeO[vertices[x].Neigh[j] - 1] * spin_f;
+               }
+
+               dE = E_f - E_i;
+               if ((dE > 0) && (dist2(rnd) < exp(-beta * dE)))
+               {
+                  lattice[x] = spin_f;
+                  // energy += dE;
+               }
+               else if (dE < 0)
+               {
+                  lattice[x] = spin_f;
+                  // energy += dE;
+               }
+
+               // net_spins[t] = thrust::reduce(thrust::host, latticeO, latticeO+V, latticeO[0]);
+               // net_energy[t] = energy;
             }
 
-            // net_spins[t] = thrust::reduce(thrust::host, latticeO, latticeO+V, latticeO[0]);
-            //net_energy[t] = energy;
+#pragma acc loop
+            for (i = 0; i < V; i++)
+            {
+               latticeO[i] = lattice[i];
+            }
          }
-
-         #pragma acc loop
-         for (i = 0; i < V; i++)
-         {
-            latticeO[i] = lattice[i];
-         }
+         s++;
       }
    }
 }
@@ -203,16 +207,16 @@ int main()
    }
 
    // Calculating Energy
-   cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
+   cout << "Energy of System is " << get_energy(lattice, vertices, V) << "\n";
 
    // Calling Metropolis Algorithm
-   int *net_spins, *net_energy, times = 10000;
+   int *net_spins, *net_energy, times = 1000;   // Sweeps or times
    i = cMM(&net_spins, times * sizeof(int));
    i = cMM(&net_energy, times * sizeof(int));
    metropolis(net_spins, net_energy, lattice, vertices, V, times, get_energy(lattice, vertices, V));
 
-   //print1D<int>(net_energy,times);
-   cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
+   // print1D<int>(net_energy,times);
+   cout << "Energy of System is " << get_energy(lattice, vertices, V) << "\n";
 
    // Calculating the Best Cut
    /*   int BestCut=0;
