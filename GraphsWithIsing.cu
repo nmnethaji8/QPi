@@ -63,6 +63,9 @@ void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, in
 
    thrust::random::ranlux24_base rnd;
    thrust::uniform_int_distribution<int> dist(0,V-1);
+   thrust::uniform_int_distribution<double> dist2(0,1);
+
+   double beta=0.1;
 
    for(t=0;t<times;t++)
    {
@@ -82,7 +85,12 @@ void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, in
       }
 
       dE = E_f-E_i;
-      if(dE<0)
+      if((dE>0)&&(dist2(rnd) < exp(-beta*dE)))
+      {
+         lattice[x]=spin_f;
+         energy+=dE;
+      }
+      else if(dE<0)
       {
          lattice[x]=spin_f;
          energy+=dE;
