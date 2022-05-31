@@ -92,6 +92,7 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
             E_i = 0;
             E_f = 0;
 
+            #pragma acc loop
             for (j = 0; j < vertices[x].n; j++)
             {
                E_i += vertices[x].wt[j] * latticeO[vertices[x].Neigh[j] - 1] * spin_i;
@@ -102,16 +103,16 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
             if ((dE > 0) && (dist2(rnd) < exp(-beta * dE)))
             {
                lattice[x] = spin_f;
-               energy += dE;
+               //energy += dE;
             }
             else if (dE < 0)
             {
                lattice[x] = spin_f;
-               energy += dE;
+               //energy += dE;
             }
 
             // net_spins[t] = thrust::reduce(thrust::host, latticeO, latticeO+V, latticeO[0]);
-            net_energy[t] = energy;
+            //net_energy[t] = energy;
          }
 
          #pragma acc loop
@@ -202,7 +203,7 @@ int main()
    }
 
    // Calculating Energy
-   // cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
+   cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
 
    // Calling Metropolis Algorithm
    int *net_spins, *net_energy, times = 10000;
@@ -211,6 +212,7 @@ int main()
    metropolis(net_spins, net_energy, lattice, vertices, V, times, get_energy(lattice, vertices, V));
 
    //print1D<int>(net_energy,times);
+   cout << "Energy of System is "<< get_energy(lattice,vertices,V) <<"\n";
 
    // Calculating the Best Cut
    /*   int BestCut=0;
