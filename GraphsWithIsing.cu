@@ -57,7 +57,7 @@ int get_energy(int *lattice, Vertix *vertices, int const V)
    return GlobalEnergy;
 }
 
-void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, int V ,int times, int energy)
+void metropolis(int *net_spins,int *net_energy,int *latticeO,Vertix *vertices, int V ,int times, int energy)
 {
    int t,x,spin_i,spin_f,E_i,E_f,j,dE;
 
@@ -66,6 +66,13 @@ void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, in
    thrust::uniform_int_distribution<double> dist2(0,1);
 
    double beta=0.7;
+   int *lattice,i;
+   i=cMM(&lattice,V*sizeof(int));
+   
+   for(i=0;i<V;i++)
+   {
+      lattice[i]=latticeO[i];
+   }
 
    for(t=0;t<times;t++)
    {
@@ -80,8 +87,8 @@ void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, in
 
       for(j=0;j<vertices[x].n;j++)
       {
-         E_i+=vertices[x].wt[j]*lattice[vertices[x].Neigh[j]-1]*spin_i;
-         E_f+=vertices[x].wt[j]*lattice[vertices[x].Neigh[j]-1]*spin_f;
+         E_i+=vertices[x].wt[j]*latticeO[vertices[x].Neigh[j]-1]*spin_i;
+         E_f+=vertices[x].wt[j]*latticeO[vertices[x].Neigh[j]-1]*spin_f;
       }
 
       dE = E_f-E_i;
@@ -96,8 +103,13 @@ void metropolis(int *net_spins,int *net_energy,int *lattice,Vertix *vertices, in
          energy+=dE;
       }
 
-      net_spins[t] = thrust::reduce(thrust::host, lattice, lattice+V, lattice[0]);
+      net_spins[t] = thrust::reduce(thrust::host, latticeO, latticeO+V, latticeO[0]);
       net_energy[t]= energy;
+   }
+
+   for(i=0;i<V;i++)
+   {
+      latticeO[i]=lattice[i];
    }
 
 }
@@ -189,7 +201,7 @@ int main()
    i=cMM(&net_energy,times*sizeof(int));
    metropolis(net_spins, net_energy,lattice,vertices, V ,times, get_energy(lattice,vertices,V));
 
-//print1D<int>(net_energy,times);
+   //print1D<int>(net_energy,times);
 
 //Calculating the Best Cut
 /*   int BestCut=0;
