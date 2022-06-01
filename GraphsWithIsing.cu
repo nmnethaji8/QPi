@@ -67,8 +67,8 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
    thrust::uniform_int_distribution<double> dist2(0, 1);
    thrust::uniform_int_distribution<int> dist3(0, Fp);
 
-   double beta = 0.7, p = Fp, decay = 0.01;
-   int *lattice, i, s = 0;
+   double beta = 0.7, p = Fp, decay = 0.01,y;
+   int *lattice, i, s = 0,z;
    i = cMM(&lattice, V * sizeof(int));
 
 #pragma acc data copy(lattice [0:V - 1], latticeO [0:V - 1], vertices [0:V - 1])
@@ -103,12 +103,14 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
                }
 
                dE = E_f - E_i;
-               if ((dE > 0) && (dist2(rnd) < exp(-beta * dE)) && (dist3(rnd) < p))
+               y=dist2(rnd);
+               z=dist3(rnd);
+               if ((dE > 0) && (y < exp(-beta * dE)) && (z < p))
                {
                   lattice[x] = spin_f;
                   // energy += dE;
                }
-               else if ((dE < 0) && (dist3(rnd) < p))
+               else if ((dE < 0) && (z < p))
                {
                   lattice[x] = spin_f;
                   // energy += dE;
