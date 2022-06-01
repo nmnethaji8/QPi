@@ -1,6 +1,11 @@
 # QPi
 GPU-accelerated solver for the Max Cut Problem in graphs
 Use nvc++ compiler from nvidia hpc-sdk and curand library for random number generation
+t1 = CPU time taken(seconds) in the published paper
+t2 = GPU time taken(seconds) achieved
+Bc1 = Best known cut in the paper
+Bc2 = Best known cut calculated on GPU
+
 Graph	Vertices Edges	Torus	t1	t2     speedup1	speedup2 Bc1	Bc2
 G13	800	1600	yes	0.17	0.074	1.5	2.2973	580	824
 G34	2000	4000	yes	0.29	0.16	2.6	1.8125	1372	2034
