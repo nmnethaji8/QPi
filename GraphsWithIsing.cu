@@ -71,24 +71,24 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
    thrust::uniform_int_distribution<int> dist3(0, Fp);
 
    double beta = 0.7, p = Fp, decay = 0.01,y;
-   int *lattice, i, s = 0,z;
-   i = cMM(&lattice, V * sizeof(int));
+   int lattice[V], i, s = 0,z;
+   //i = cMM(&lattice, V * sizeof(int));
 
    curandState_t state;
 
-#pragma acc data copy(lattice [0:V - 1], latticeO [0:V - 1], vertices [0:V - 1])
+#pragma acc data create(lattice [0:V - 1]) copy(latticeO [0:V - 1], vertices [0:V - 1])
    {
       while (s < times)
       {
 //#pragma acc kernels
          {
-#pragma acc parallel loop gang num_gangs(V) present(lattice,latticeO)
+#pragma acc parallel loop gang num_gangs(V) present(latticeO)
             for (i = 0; i < V; i++)
             {
                lattice[i] = latticeO[i];
             }
 
-#pragma acc parallel loop gang num_gangs(V) private(state) present(lattice,latticeO,vertices)
+#pragma acc parallel loop gang num_gangs(V) private(state) present(latticeO,vertices)
             for (t = 0; t < V; t++)
             {
                curand_init(t*(s+1), 0ULL, 0ULL, &state);
@@ -132,7 +132,7 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
                // net_energy[t] = energy;
             }
 
-#pragma acc parallel loop gang num_gangs(V) present(lattice,latticeO)
+#pragma acc parallel loop gang num_gangs(V) present(latticeO)
             for (i = 0; i < V; i++)
             {
                latticeO[i] = lattice[i];
