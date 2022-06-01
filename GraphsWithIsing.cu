@@ -6,6 +6,8 @@
 #include <thrust/random/linear_congruential_engine.h>
 #include <thrust/random/uniform_int_distribution.h>
 
+#include<openacc_curand.h>
+
 using namespace std;
 
 #define cMM cudaMallocManaged
@@ -71,6 +73,8 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
    int *lattice, i, s = 0,z;
    i = cMM(&lattice, V * sizeof(int));
 
+   curandState_t state;
+
 #pragma acc data copy(lattice [0:V - 1], latticeO [0:V - 1], vertices [0:V - 1])
    {
       while (s < times)
@@ -86,6 +90,7 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
 #pragma acc loop
             for (t = 0; t < V; t++)
             {
+               curand_init(t, 0ULL, 0ULL, &state);
                x = dist(rnd);
 
                spin_i = lattice[x]; // initial spin
@@ -103,7 +108,9 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
                }
 
                dE = E_f - E_i;
-               y=dist2(rnd);
+               //y=dist2(rnd);
+               y = curand_uniform(&state);
+               printf("%f\n",y);
                z=dist3(rnd);
                if ((dE > 0) && (y < exp(-beta * dE)) && (z < p))
                {
