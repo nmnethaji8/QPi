@@ -18,7 +18,7 @@ flags=-acc
 #	rm -rf IsingFort *.o *.mod Ising
 
 GraphsWithIsing:GraphsWithIsing.cu
-	$(nv) $(flags) GraphsWithIsing.cu -o GraphsWithIsing
+	$(nv) $(flags) -Mcudalib=curand GraphsWithIsing.cu -o GraphsWithIsing
 
 cleanAll:
 	rm -rf IsingFort *.o *.mod Ising GraphsWithIsing
