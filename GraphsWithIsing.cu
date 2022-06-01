@@ -90,8 +90,10 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
 #pragma acc loop
             for (t = 0; t < V; t++)
             {
-               curand_init(t, 0ULL, 0ULL, &state);
-               x = dist(rnd);
+               curand_init(t*(s+1), 0ULL, 0ULL, &state);
+               //x = dist(rnd);
+               x=(int)(curand_uniform(&state)*V);
+               //printf("%d\n",x);
 
                spin_i = lattice[x]; // initial spin
                spin_f = -spin_i;    // proposed spin flip
@@ -110,8 +112,10 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
                dE = E_f - E_i;
                //y=dist2(rnd);
                y = curand_uniform(&state);
-               printf("%f\n",y);
-               z=dist3(rnd);
+               //printf("%f\n",y);
+               //z=dist3(rnd);
+               z=(int)(curand_uniform(&state)*Fp);
+               //printf("%d\n",z);
                if ((dE > 0) && (y < exp(-beta * dE)) && (z < p))
                {
                   lattice[x] = spin_f;
