@@ -82,7 +82,7 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
       {
 //#pragma acc kernels
          {
-//#pragma acc loop
+#pragma acc parallel loop gang num_gangs(V) present(lattice,latticeO)
             for (i = 0; i < V; i++)
             {
                lattice[i] = latticeO[i];
@@ -103,7 +103,7 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
                E_i = 0;
                E_f = 0;
 
-//#pragma acc loop
+#pragma acc loop
                for (j = 0; j < vertices[x].n; j++)
                {
                   E_i += vertices[x].wt[j] * latticeO[vertices[x].Neigh[j] - 1] * spin_i;
@@ -132,7 +132,7 @@ void metropolis(int *net_spins, int *net_energy, int *latticeO, Vertix *vertices
                // net_energy[t] = energy;
             }
 
-//#pragma acc loop
+#pragma acc parallel loop gang num_gangs(V) present(lattice,latticeO)
             for (i = 0; i < V; i++)
             {
                latticeO[i] = lattice[i];
@@ -226,7 +226,7 @@ int main()
    cout << "Energy of System is " << get_energy(lattice, vertices, V) << "\n";
 
    // Calling Metropolis Algorithm
-   int *net_spins, *net_energy, times = 10000; // Sweeps or times
+   int *net_spins, *net_energy, times = 1000; // Sweeps or times
    i = cMM(&net_spins, times * sizeof(int));
    i = cMM(&net_energy, times * sizeof(int));
    metropolis(net_spins, net_energy, lattice, vertices, V, times, get_energy(lattice, vertices, V));
